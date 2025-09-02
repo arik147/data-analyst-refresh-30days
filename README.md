@@ -48,6 +48,8 @@ Each day focuses on a specific area (Excel, SQL, Statistics, Python, and Visuali
 ---
 
 ## 📂 Repository Structure  
+
+```bash
 data-analyst-refresh-30days/
 │
 ├── week1_descriptive_sql_excel/
@@ -77,6 +79,7 @@ data-analyst-refresh-30days/
 │
 └── README.md
 
+```
 
 ---
 
