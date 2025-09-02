@@ -1,0 +1,68 @@
+-- East region only
+-- SELECT
+--     "REGION",
+--     "SALES",
+--     "PROFIT"
+-- FROM
+--     "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+-- WHERE
+--     "REGION" = 'East'
+-- LIMIT 10;
+
+-- order above $1000
+-- SELECT
+--     "ORDER_ID",
+--     "CUSTOMER_NAME",
+--     "SALES"
+-- FROM
+--     "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+-- WHERE
+--     "SALES" > 1000
+-- ORDER BY
+--     "SALES" DESC
+-- LIMIT 10;
+
+-- Total sales by category
+-- SELECT
+--     "CATEGORY",
+--     ROUND(SUM("SALES"), 2) AS TOTAL_SALES
+-- FROM
+--     "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+-- GROUP BY
+--     "CATEGORY"
+-- ORDER BY
+--     TOTAL_SALES DESC;
+
+-- Sales by region
+-- SELECT
+--     "REGION",
+--     ROUND(SUM("SALES"), 2) AS TOTAL_SALES
+-- FROM
+--     "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+-- GROUP BY
+--     "REGION"
+-- ORDER BY
+--     TOTAL_SALES DESC;
+
+-- Sales by segment
+-- SELECT
+--   "SEGMENT",
+--   ROUND(SUM("SALES"), 2) AS TOTAL_SALES,
+--   ROUND(AVG("PROFIT"), 2) AS AVG_PROFIT_PER_ORDER
+-- FROM
+--   "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+-- GROUP BY
+--   "SEGMENT"
+-- ORDER BY
+--   TOTAL_SALES DESC;
+
+SELECT
+  "REGION",
+  "SEGMENT",
+  ROUND(SUM("SALES"), 2) AS TOTAL_SALES
+FROM
+  "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+GROUP BY
+  "REGION", "SEGMENT"
+ORDER BY
+  "REGION", TOTAL_SALES DESC;
