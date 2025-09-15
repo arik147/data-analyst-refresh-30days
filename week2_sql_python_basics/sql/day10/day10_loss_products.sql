@@ -1,0 +1,12 @@
+-- Day 10: Product-level losses (most negative first)
+SELECT
+  "PRODUCT_ID",
+  "PRODUCT_NAME",
+  "SUB_CATEGORY",
+  ROUND(SUM("SALES"), 2)  AS total_sales,
+  ROUND(SUM("PROFIT"), 2) AS total_profit
+FROM "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+GROUP BY "PRODUCT_ID","PRODUCT_NAME","SUB_CATEGORY"
+HAVING SUM("PROFIT") < 0
+ORDER BY total_profit ASC
+LIMIT 50;
