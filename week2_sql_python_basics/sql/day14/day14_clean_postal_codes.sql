@@ -1,0 +1,6 @@
+-- Day 14: Clean postal codes by removing spaces and trimming
+SELECT 
+  POSTAL_CODE,
+  TRIM(REPLACE(POSTAL_CODE, ' ', '')) AS CLEAN_POSTAL_CODE
+FROM "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+LIMIT 50;

@@ -1,0 +1,6 @@
+-- Day 14: Find products containing the word 'Table' (case-insensitive)
+SELECT 
+  PRODUCT_NAME
+FROM "SUPERSTOREDB"."PUBLIC"."SUPERSTORE_SALES"
+WHERE POSITION('TABLE' IN UPPER(PRODUCT_NAME)) > 0
+LIMIT 50;
