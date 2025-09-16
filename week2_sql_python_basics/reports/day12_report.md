@@ -1,68 +1,105 @@
-# 📅 Day 12 — Advanced Window Frames
+# 📅 Day 12 — Advanced Window Frames (Demo Results & Insights)
 
-Dataset: `SUPERSTOREDB.PUBLIC.SUPERSTORE_SALES`
+*Note:* These results are generated on a **synthetic Superstore-like dataset** for demo purposes. Replace with your Snowflake outputs for your repo.  
 
-## 🎯 Goals
-- Use **window frame clauses** (`ROWS` vs `RANGE`) correctly.
-- Build **rolling sums** and **moving averages**.
-- Compute **MTD** metrics within partitions.
-- Compare **current vs previous** values using `LAG`.
+Dataset reference: `SUPERSTOREDB.PUBLIC.SUPERSTORE_SALES`
 
 ---
 
-## 1) 7-Day Rolling Sales (Calendar-Based)
-**File:** `day12_rolling_7days_range.sql`  
-Uses a time-aware frame: `RANGE BETWEEN INTERVAL '6 DAY' PRECEDING AND CURRENT ROW`.
+## 1) 7-Day Rolling Sales — Calendar-Based (RANGE)
+**SQL file:** `day12_rolling_7days_range.sql`
 
-**Expected columns:** `ORDER_DATE`, `DAILY_SALES`, `SALES_LAST_7_DAYS`
+**Sample output (first 12 rows):**
 
-> Tip (Snowsight chart): Line chart with X = `ORDER_DATE`, Y = `SALES_LAST_7_DAYS`.
+| ORDER_DATE | DAILY_SALES | SALES_LAST_7_DAYS |
+|------------|-------------|-------------------|
+| 2015-01-01 | 477.34      | 477.34            |
+| 2015-01-02 | 627.47      | 1,104.81          |
+| 2015-01-03 | 889.57      | 1,994.38          |
+| 2015-01-04 | 575.86      | 2,570.24          |
+| …          | …           | …                 |
 
----
-
-## 2) 7-Day Rolling Sales (Row-Based)
-**File:** `day12_rolling_7days_rows.sql`  
-Uses `ROWS BETWEEN 6 PRECEDING AND CURRENT ROW`. Good if you have 1 row/day without gaps.
-
-**Expected columns:** `ORDER_DATE`, `DAILY_SALES`, `SALES_LAST_7_ROWS`
-
----
-
-## 3) 30-Day Moving Average
-**File:** `day12_moving_avg_30d.sql`  
-Smooths daily volatility using a 30-day calendar window.
-
-**Expected columns:** `ORDER_DATE`, `DAILY_SALES`, `AVG_SALES_30D`
+📌 **Insight:**  
+- Rolling totals smooth daily fluctuations.  
+- In this sample, sales grow steadily within each 7-day window, showing consistent weekly demand.
 
 ---
 
-## 4) Month-to-Date (MTD) Sales
-**File:** `day12_mtd_sales.sql`  
-Partitions by month start, then accumulates daily sales within each month.
+## 2) 7-Day Rolling Sales — Row-Based (ROWS)
+**SQL file:** `day12_rolling_7days_rows.sql`
 
-**Expected columns:** `MONTH_START`, `ORDER_DATE`, `DAILY_SALES`, `MTD_SALES`
+**Sample output (first 12 rows):**
 
----
+| ORDER_DATE | DAILY_SALES | SALES_LAST_7_ROWS |
+|------------|-------------|--------------------|
+| 2015-01-01 | 477.34      | 477.34             |
+| 2015-01-02 | 627.47      | 1,104.81           |
+| 2015-01-03 | 889.57      | 1,994.38           |
+| 2015-01-04 | 575.86      | 2,570.24           |
+| …          | …           | …                  |
 
-## 5) Previous vs Current Order (per Customer)
-**File:** `day12_customer_order_compare.sql`  
-Uses `LAG` to reference the previous order's `SALES` within each `CUSTOMER_ID`.
-
-**Expected columns:** `CUSTOMER_ID`, `ORDER_ID`, `ORDER_DATE`, `SALES`, `PREVIOUS_ORDER_SALES`
-
----
-
-## 🧠 Notes
-- If you see `not a valid group by expression`, first **aggregate** to the desired grain (daily, monthly, etc.), then apply the window over that result.
-- `RANGE` is **time-aware** (e.g., 30 calendar days), while `ROWS` is **row-count based** (e.g., last 7 rows). Choose based on your data shape and business need.
-
-## ✅ Optional KPIs to add in README
-- Last 30-day average vs previous 30-day average
-- Highest MTD month and value
-- # of customers with increasing order value (current > previous)
+📌 **Insight:**  
+- Similar to the calendar-based window here, since every date has data.  
+- In real Snowflake results, if days are missing, `ROWS` may differ from `RANGE`.
 
 ---
 
-### 📎 How to use
-1. Run the `.sql` files in Snowflake.
-2. Save result snippets (or charts) into your Day 12 README as needed.
+## 3) 30-Day Moving Average of Daily Sales
+**SQL file:** `day12_moving_avg_30d.sql`
+
+**Sample output (first 12 rows):**
+
+| ORDER_DATE | DAILY_SALES | AVG_SALES_30D |
+|------------|-------------|----------------|
+| 2015-01-01 | 477.34      | 477.34         |
+| 2015-01-02 | 627.47      | 552.41         |
+| 2015-01-03 | 889.57      | 664.79         |
+| …          | …           | …              |
+
+📌 **Insight:**  
+- Moving averages smooth volatility.  
+- Trends are easier to see—if the 30-day average rises steadily, long-term sales are healthy.
+
+---
+
+## 4) Month-to-Date (MTD) Sales per Month
+**SQL file:** `day12_mtd_sales.sql`
+
+**Sample output (first 12 rows):**
+
+| MONTH_START | ORDER_DATE | DAILY_SALES | MTD_SALES |
+|-------------|------------|-------------|-----------|
+| 2015-01-01  | 2015-01-01 | 477.34      | 477.34    |
+| 2015-01-01  | 2015-01-02 | 627.47      | 1,104.81  |
+| 2015-01-01  | 2015-01-03 | 889.57      | 1,994.38  |
+| …           | …          | …           | …         |
+
+📌 **Insight:**  
+- Shows how sales accumulate during a month.  
+- By mid-month, performance can be compared against targets or previous months.
+
+---
+
+## 5) Previous vs Current Order (per Customer) — LAG
+**SQL file:** `day12_customer_order_compare.sql`
+
+**Sample output (first 12 rows):**
+
+| CUSTOMER_ID | ORDER_ID       | ORDER_DATE | SALES  | PREVIOUS_ORDER_SALES |
+|-------------|----------------|------------|--------|-----------------------|
+| CUST-001    | ORD-20150101-1 | 2015-01-01 | 350.00 | NULL                  |
+| CUST-001    | ORD-20150107-9 | 2015-01-07 | 420.00 | 350.00                |
+| CUST-002    | ORD-20150102-4 | 2015-01-02 | 515.00 | NULL                  |
+| …           | …              | …          | …      | …                     |
+
+📌 **Insight:**  
+- Lets us analyze order progression.  
+- Example: If a customer’s sales rise in later orders, it signals growing engagement; if they shrink, it may indicate churn risk.
+
+---
+
+## 📌 Key Takeaways from Day 12
+- **Window Frames** (`ROWS` vs `RANGE`) are powerful for time-series analysis.  
+- **Rolling sums & averages** help spot trends beyond daily noise.  
+- **MTD metrics** are vital for operational monitoring.  
+- **LAG comparisons** highlight customer behavior changes order-over-order.  
